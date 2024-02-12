@@ -12,6 +12,6 @@ The process is as follows:
 
 4. ```sareana.py``` to combine the cloud map and the saliency map. The inverse of the cloud map is used as the blue channel of a new image and the saliency map as the green channel. The resulting output looks like this:
 ![combined saliency and cloudiness maps](sareana.jpg)
-Additionally, ```sareana.py``` will output a region level combined slaiency and cloudiness map with equal weighting where each pixel in a region is assigned the value of the normalized sum of the saliency and inverse cloudiness in the image:
+Additionally, ```sareana.py``` will output a region level combined slaiency and cloudiness map with equal weighting where each pixel in a region is assigned the value of the product of the saliency and inverse cloudiness in the image:
 ![region level world saliency](reg_sareana.jpg)
 A sorted numpy array ```sorted_region_saliencys.npy``` is saved as well, containing regions and their saliencys in descending order of saliency.
