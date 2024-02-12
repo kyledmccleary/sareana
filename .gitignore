@@ -159,7 +159,7 @@ cython_debug/
 #  option (not recommended) you can uncomment the following to ignore the entire idea folder.
 #.idea/
 
-# derived image folders
-bm1k_consolidated_maps/
+# derived folders from world maps
 bm1k_maps/
+bm1k_consolidated_maps/
 bm1k_regions/
