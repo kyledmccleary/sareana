@@ -1,7 +1,6 @@
 import os
 import cv2
 import numpy as np
-from tqdm import tqdm
 from multiprocessing import Pool
 from getMGRS import getMGRS
 
@@ -16,8 +15,8 @@ lon_per_pix = (max_lon - min_lon) / 21600
 lat_per_pix = (max_lat - min_lat) / 10800
 regions_folder = 'bm1k_consolidated_maps'
 
-SAVE_REGIONS = False
-RECOMBINE = True
+SAVE_REGIONS = True
+RECOMBINE = False
 
 def save_regions(file):
     im = cv2.imread(os.path.join(folder, file))

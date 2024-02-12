@@ -1,7 +1,6 @@
 import os
 import cv2
 import numpy as np
-from tqdm import tqdm
 from multiprocessing import Pool
 from getMGRS import getMGRS
 
@@ -10,9 +9,9 @@ outfolder = 'bm1k_maps'
 consfolder = 'bm1k_consolidated_maps'
 cloudfolder = 'cloud_maps'
 saliency = cv2.saliency.StaticSaliencyFineGrained_create()
-SAVEMAP = False
-CONSOLIDATE = False
-CLOUDS = True
+SAVEMAP = True
+CONSOLIDATE = True
+CLOUDS = False
 MONTHS = ['jan', 'feb', 'mar', 'apr', 'may', 'jun', 
           'jul', 'aug', 'sep', 'oct', 'nov', 'dec']
 
@@ -21,7 +20,6 @@ def save_map(file, subfolder):
     _, saliency_map = saliency.computeSaliency(im)
     saliency_map_int = (saliency_map * 255).astype("uint8")
     cv2.imwrite(os.path.join(outfolder, subfolder, file), saliency_map_int)
-    print(file, 'done')
     return saliency_map
 
 def consolidate_region_maps(region):
@@ -50,18 +48,22 @@ def consolidate_clouds():
     conscloud = conscloud.astype('uint8')
     cv2.imwrite('consolidated_cloudmap.jpg', conscloud)
 
+def one_month(month):
+    if not os.path.exists(os.path.join(outfolder, 'world_'+month)):
+        os.mkdir(os.path.join(outfolder, 'world_'+month))           
+    for file in os.listdir(os.path.join(folder, 'world_'+month)):
+        save_map(file, 'world_'+month)
+    print(month, 'done')
+
+
 
 if __name__ == '__main__':
     grid = getMGRS()
     if not os.path.exists(outfolder):
         os.mkdir(outfolder)
     if SAVEMAP:
-        for month in MONTHS:
-            if not os.path.exists(os.path.join(outfolder, 'world_'+month)):
-                os.mkdir(os.path.join(outfolder, 'world_'+month))           
-            for file in os.listdir(os.path.join(folder, 'world_'+month)):
-                filepath = os.path.join(folder, 'world_'+month, file)
-                save_map(file, 'world_'+month)
+        with Pool(12) as p:
+            p.map(one_month, MONTHS)
     if CONSOLIDATE:
         if not os.path.exists(consfolder):
             os.mkdir(consfolder)
