@@ -12,19 +12,29 @@ lat_per_pix = (max_lat - min_lat) / 10800
 def sareana(cloud_im_path, saliency_im_path, grid):
     cloud_im = cv2.imread(cloud_im_path)
     cloud_im = ~cv2.cvtColor(cloud_im, cv2.COLOR_BGR2GRAY)
-    cv2.imshow('cloud_im', cloud_im)
-    cv2.waitKey(0)
+    cv2.imwrite('inverse_cloud_map.jpg', cloud_im)
+    cloud_im = cloud_im.astype('float32')
+    cloud_im = cloud_im / cloud_im.max()
     saliency_im = cv2.imread(saliency_im_path)
     saliency_im = cv2.cvtColor(saliency_im, cv2.COLOR_BGR2GRAY)
+    saliency_im = saliency_im.astype('float32')
+    saliency_im = saliency_im / saliency_im.max()
     im_height, im_width = saliency_im.shape[:2]
     cloud_im_resized = cv2.resize(cloud_im, (im_width, im_height))
     sareana_im = np.zeros((im_height, im_width, 3), dtype=np.uint8)
-    sareana_im[:, :, 0] = cloud_im_resized
-    sareana_im[:, :, 1] = saliency_im
+    sareana_im[:, :, 0] = (255*cloud_im_resized.copy()).astype('uint8')
+    sareana_im[:, :, 1] = (255*saliency_im.copy()).astype('uint8')
     cv2.imwrite('sareana.jpg', sareana_im)
+    sareana_mul = cloud_im_resized * saliency_im
+    sareana_mul = sareana_mul / sareana_mul.max()
+    sareana_mul_im = (sareana_mul.copy()*255).astype('uint8')
+    sareana_im[:, :, 2] = sareana_mul_im
+    cv2.imwrite('sareana_mul.jpg', sareana_im)
+    cv2.imwrite('sareana_only_mul.jpg', sareana_mul_im)
 
-    reg_sareana = sareana_im.copy().astype('float32')
-    reg_sareana = cv2.cvtColor(reg_sareana, cv2.COLOR_BGR2GRAY)
+    reg_sareana = sareana_mul.copy()
+    cv2.imshow('sareana_mul', sareana_mul)
+    cv2.waitKey(0)
     reg_sals = {}
     for key, value in grid.items():
         left, bottom, right, top = value
@@ -36,7 +46,7 @@ def sareana(cloud_im_path, saliency_im_path, grid):
         right_px = int(right/lon_per_pix)
         top_px = int(bottom/lat_per_pix)
         bottom_px = int(top/lat_per_pix)
-        region_im = sareana_im[bottom_px:top_px, left_px:right_px]
+        region_im = sareana_mul[bottom_px:top_px, left_px:right_px]
         region_sal = region_im.sum() / (region_im.shape[0] * region_im.shape[1])
         reg_sals[key] = region_sal
         reg_sareana[bottom_px:top_px, left_px:right_px] = region_sal
