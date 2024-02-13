@@ -52,6 +52,7 @@ if __name__ == '__main__':
     region = '17R'
     pool = Pool(cpu_count())
     landmarks = pool.starmap(landmarks_at_scale, [(region, scale) for scale in scales])
+    landmarks_array = np.concatenate(landmarks, axis=0)
+    np.save(region+'_pixel_landmarks.npy', landmarks_array)
     pool.close()
     pool.join()
-    print(landmarks)
