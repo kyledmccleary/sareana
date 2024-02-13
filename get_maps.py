@@ -11,7 +11,7 @@ cloudfolder = 'cloud_maps'
 saliency = cv2.saliency.StaticSaliencyFineGrained_create()
 SAVEMAP = True
 CONSOLIDATE = True
-CLOUDS = False
+CLOUDS = True
 MONTHS = ['jan', 'feb', 'mar', 'apr', 'may', 'jun', 
           'jul', 'aug', 'sep', 'oct', 'nov', 'dec']
 
