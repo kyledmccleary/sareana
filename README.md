@@ -15,3 +15,5 @@ The process is as follows:
 Additionally, ```sareana.py``` will output a region level combined slaiency and cloudiness map with equal weighting where each pixel in a region is assigned the value of the product of the saliency and inverse cloudiness in the image:
 ![region level world saliency](reg_sareana.jpg)
 A sorted numpy array ```sorted_region_saliencys.npy``` is saved as well, containing regions and their saliencys in descending order of saliency.
+
+5. ```landmark_analysis.py``` to use the consolidated saliency map of a region to select landmarks across a range of scales in a specific region until a fraction of the maximum saliency is reached. 
