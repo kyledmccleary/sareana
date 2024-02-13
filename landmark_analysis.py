@@ -21,7 +21,7 @@ def parse_args():
     parser.add_argument('-f', '--fraction', type=float, default=0.5, help='Fraction of overall max to consider as a landmark')
     parser.add_argument('-c', '--calculate', action='store_true', help='Calculate landmarks')
     parser.add_argument('-v', '--visualize', action='store_true', help='Visualize landmarks')
-    parser.add_argument('--suffix', type=str, help='suffix for the output file')
+    parser.add_argument('--suffix', type=str, default = '', help='suffix for the output file')
     return parser.parse_args()
 
 def landmarks_at_scale(region, scale):
