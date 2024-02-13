@@ -33,8 +33,6 @@ def sareana(cloud_im_path, saliency_im_path, grid):
     cv2.imwrite('sareana_only_mul.jpg', sareana_mul_im)
 
     reg_sareana = sareana_mul.copy()
-    cv2.imshow('sareana_mul', sareana_mul)
-    cv2.waitKey(0)
     reg_sals = {}
     for key, value in grid.items():
         left, bottom, right, top = value
@@ -47,13 +45,21 @@ def sareana(cloud_im_path, saliency_im_path, grid):
         top_px = int(bottom/lat_per_pix)
         bottom_px = int(top/lat_per_pix)
         region_im = sareana_mul[bottom_px:top_px, left_px:right_px]
-        region_sal = region_im.sum() / (region_im.shape[0] * region_im.shape[1])
+        if key[-1] == 'X' or key[-1] == 'W' or key[-1] == 'C' or key[-1] == 'D':
+            region_sal = 0
+        else:
+            region_sal = region_im.sum() / (region_im.shape[0] * region_im.shape[1])
         reg_sals[key] = region_sal
         reg_sareana[bottom_px:top_px, left_px:right_px] = region_sal
     reg_sareana = reg_sareana / reg_sareana.max() * 255
     reg_sareana = reg_sareana.astype('uint8')
     cv2.imwrite('reg_sareana.jpg', reg_sareana)
     sorted_reg_sals = sorted(reg_sals.items(), key=lambda x: x[1], reverse=True)
+    with open('prioritized_regions.csv', 'w') as f:
+        for key, value in sorted_reg_sals:
+            if value == 0:
+                break
+            f.write(key + ',')
     return sorted_reg_sals
 
 
