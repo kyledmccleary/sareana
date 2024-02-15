@@ -57,7 +57,7 @@ def landmarks_at_scale(region, scale):
         if maxsum < fraction*overall_max:
             break                
         # old_sal = maxsum
-        landmark_list.append([max_loc[0], max_loc[1], scale])
+        landmark_list.append([max_loc[0], max_loc[1], scale, maxsum])
     return landmark_list
 
 def visualize_landmarks(region, landmarks):
@@ -67,11 +67,11 @@ def visualize_landmarks(region, landmarks):
         os.makedirs(landmarks_visualization_path)
     im = cv2.imread('bm1k_regions/world_jun/' + region + '.jpg')
     for landmark in landmarks:
-        x, y, scale = landmark
+        x, y, scale, saliency = landmark
         cv2.rectangle(im, (x, y), (x+scale, y+scale), (0, 255, 0), 1)
     cv2.imwrite(landmarks_visualization_path + '/' + region + '_' + args.suffix + '.jpg', im)    
     cv2.imshow('Landmarks', im)
-    cv2.waitKey(0)   
+    cv2.waitKey(0)
 
 def get_absolute_landmarks(region, landmarks):
     bounds = getMGRS()[region]
@@ -82,7 +82,7 @@ def get_absolute_landmarks(region, landmarks):
     lat_per_pix = (maxy - miny) / reg_im_height
     absolute_landmarks = []
     for landmark in landmarks:
-        x, y, scale = landmark
+        x, y, scale, saliency = landmark
         x2, y2 = x+scale, y+scale
         x_min_lon = minx + x * lon_per_pix
         x_max_lon = minx + x2 * lon_per_pix
@@ -90,7 +90,7 @@ def get_absolute_landmarks(region, landmarks):
         y_max_lat = maxy - y * lat_per_pix
         x_center_lon = (x_min_lon + x_max_lon) / 2
         y_center_lat = (y_min_lat + y_max_lat) / 2
-        absolute_landmarks.append([x_center_lon, y_center_lat, x_min_lon, y_min_lat, x_max_lon, y_max_lat, scale])
+        absolute_landmarks.append([x_center_lon, y_center_lat, x_min_lon, y_min_lat, x_max_lon, y_max_lat, scale, saliency])
     return absolute_landmarks
 
 args = parse_args()
@@ -111,11 +111,11 @@ if __name__ == '__main__':
         np.save(landmarks_pixel_path + '/' + region+'_pixel_landmarks' + args.suffix + '.npy', landmarks_array)
         pool.close()
         pool.join()
-        absolute_landmarks = get_absolute_landmarks(region, np.load(landmarks_pixel_path + '/' + region+'_pixel_landmarks.npy'))
+        absolute_landmarks = get_absolute_landmarks(region, np.load(landmarks_pixel_path + '/' + region+'_pixel_landmarks' + args.suffix + '.npy'))
         np.save(landmarks_path + '/' + region + '_landmarks' + args.suffix + '.npy', absolute_landmarks)
         with open(landmarks_path + '/' + region + '_landmarks' + args.suffix + '.csv', 'w') as f:
-            f.write('x_center_lon,y_center_lat,x_min_lon,y_min_lat,x_max_lon,y_max_lat,scale\n')
+            f.write('x_center_lon,y_center_lat,x_min_lon,y_min_lat,x_max_lon,y_max_lat,scale,saliency\n')
             for landmark in absolute_landmarks:
                 f.write(str(landmark)[1:-1] + '\n')
     if VISUALIZE_LANDMARKS:
-        visualize_landmarks(region, np.load(landmarks_pixel_path + '/' + region+'_pixel_landmarks' + args.suffix + '.npy'))   
+        visualize_landmarks(region, np.load(landmarks_pixel_path + '/' + region+'_pixel_landmarks' + args.suffix + '.npy'))
