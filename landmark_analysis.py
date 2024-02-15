@@ -54,7 +54,7 @@ def landmarks_at_scale(region, scale):
         # else:
         if overall_max is None:
             overall_max = maxsum
-        if maxsum < fraction*overall_max:
+        if maxsum <= fraction*overall_max:
             break                
         # old_sal = maxsum
         landmark_list.append([max_loc[0], max_loc[1], scale, maxsum])
