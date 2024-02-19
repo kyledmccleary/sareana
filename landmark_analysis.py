@@ -76,7 +76,7 @@ def visualize_landmarks(region, landmarks):
 def get_absolute_landmarks(region, landmarks):
     bounds = getMGRS()[region]
     reg_im = cv2.imread('bm1k_regions/world_jun/' + region + '.jpg')
-    reg_im_width, reg_im_height = reg_im.shape[:2]
+    reg_im_height, reg_im_width = reg_im.shape[:2]
     minx, miny, maxx, maxy = bounds
     lon_per_pix = (maxx - minx) / reg_im_width
     lat_per_pix = (maxy - miny) / reg_im_height
